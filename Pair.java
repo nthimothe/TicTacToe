@@ -114,7 +114,7 @@ public class Pair<K, V>{
 	nums[3] += 100;
 	e.getKey()[1]++;
 	e.getKey()[2]++;
-
+	e.key = new int[]{0};
 	for (int i = 0; i < e.getKey().length; i++){
 	    System.out.println(e.getKey()[i]);
 	}

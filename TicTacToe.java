@@ -14,6 +14,7 @@ import java.io.FileReader;
 import java.io.BufferedReader;
 import java.util.Calendar;
 import java.text.ParseException;
+import java.util.Arrays;
 
 public class TicTacToe{
     /* INSTANCE VARIABLES */
@@ -138,12 +139,8 @@ public class TicTacToe{
      * @return whether not position row,col is occupied
      */     
     public boolean isOccupied(int row, int col){
-	//if the character that the user entered is not an empty space, it is occupied
-	if (board[row][col] != ' '){
-	    return true;
-	}
-	//else, that position is not occupied;
-	return false;
+	//if the character that the user entered is not an empty space, it is occupied, else it is 
+	return board[row][col] != ' ';
     }
 
     /**
@@ -156,7 +153,6 @@ public class TicTacToe{
 	board[row][col] = preference;
     }
 
-
     /**
      * Checks whether the game is won by checking if there are 3 Xs or 3 Os in a row.
      * @param pref user preference
@@ -165,47 +161,26 @@ public class TicTacToe{
     public boolean checkWin(char pref){
 	// On a 3x3 board, there are 8 ways to win! we can check these 8 ways 
 	// Do not have to check for wins until at least 3 turns in also! 
-	// check first row first
-	if (board[0][0] == pref){
-	    //horizontal win in the first row
-	    if (board[0][1] == pref && board[0][2] == pref){
-		return true;
-	    }
-	    //diagonal win
-	    else if (board[1][1] == pref && board[2][2] == pref){
-		return true;
-	    }
+	int[][] wins = {{0,0}, {0,1}, {0,2}, {1,0}, {1,1}, {1,2}, {2,0}, {2,1}, {2,2}, {0,0}, {1,0}, {2,0}, {0,1}, {1,1}, {2,1}, {0,2}, {1,2}, {2,2}, {0,0}, {1,1}, {2,2}, {0,2}, {1,1}, {2,0} };
 
-	    //vertical win
-	    else if(board[1][0] == pref && board[2][0] == pref){
-		return true;
-	    }
-
-	}
-	//vertical win (starting from 2nd element in first row)
-	if (board[0][1] == pref && board[1][1] == pref && board[2][1] == pref){
-	    return true;
-	}
-	//checking all wins that stem from last element in first row
-	if (board[0][2] == pref){
-	    //diagonal win
-	    if (board[1][1] == pref && board[2][0] == pref){
-		return true;
-	    }
-	    //vertical win
-	    else if (board[1][2] == pref && board[2][2] == pref){
+	int j = 0;
+	// create size 3 windows to iterate through wins
+	for (int i = 0; i < 8; i++){
+	    int[][] slice = Arrays.copyOfRange(wins, j, j+3);
+	    System.out.print("slice: ");
+	    for (int b = 0; b < slice.length; b++) System.out.print( Arrays.toString(slice[b]) + " ");
+	    System.out.print("length: " + slice.length);
+	    System.out.println();
+	    j += 3;
+	    // slice contains coordinates for the board, so index into the board anc check win
+	    if ((this.board[slice[0][0]][slice[0][1]] == pref) &&
+		(this.board[slice[1][0]][slice[1][1]] == pref) && 
+		(this.board[slice[2][0]][slice[2][1]] == pref)){
+		System.out.println("returning true");
 		return true;
 	    }
 	}
-
-	//horizontal win in the second row
-	if (board[1][0] == pref && board[1][1] == pref && board[1][2] == pref){
-	    return true;
-	}
-	//horizontal win in the third row
-	if (board[2][0] == pref && board[2][1] == pref && board[2][2] == pref){
-	    return true;
-	}
+	System.out.println("returning false");
 	return false;
     }
 
@@ -463,13 +438,11 @@ public class TicTacToe{
 		} catch (ParseException e){
 		    System.out.println("Bad date");
 		}
-
 		//convert the date object to Calendar to determine if it should be added
 		Calendar cal = Calendar.getInstance();
 		cal.setTime(date);
 		// subtract 7 days from current date
 		curr.add(Calendar.DATE, -7);
-
 		//add all dates that are within the week to the map
 		if (cal.getTime().after(curr.getTime())){
 		    //if this is not the first time seeing this name, increment the count by 1 and put it back in map
@@ -514,12 +487,10 @@ public class TicTacToe{
 	    String formattedDate = format.format(date);
 	    if (winCount == 1){
 		s.append("\n\""+ name + "\"" + " (Player " + playerNumber + ") " + "won on " + formattedDate + "\n");
-	    }
-	    else{ 
+	    } else{ 
 		if (winCount < 6){
 		    s.append("\n\"" + name + "\" has won " + winCount + " times in the past week! Their most recent win was on " + formattedDate + "!\n");
-		} 
-		else{
+		} else{
 		    //this needs to show up first!
 		    s.append("\n\"" + name + "\" is really on fire \uD83D\uDD25\uD83D\uDD25\uD83D\uDD25!");
 		}
@@ -539,15 +510,11 @@ public class TicTacToe{
 	Scanner s = new Scanner(System.in);
 	boolean isValidInput;
 	Map<String,Pair<int[], Date>> map = load();
+
 	//load the week's winners!
-	//if the map is null or empty, don't print it, else print it 
-	if (map == null || (map.isEmpty())){
-	    //add a new line for formatting purposes if there are no winners
-	    System.out.println();
-	} else{
-	    //print it out
-	    System.out.println(formatWinnerMap(map));
-	}
+	//if the map is null or empty, just print a new line, else print it 
+	if (map == null || (map.isEmpty())) System.out.println();
+	else System.out.println(formatWinnerMap(map));
 
 	// begin game
 	String player1, player2;
@@ -566,10 +533,11 @@ public class TicTacToe{
 	while(p1Pref == '!'){ // '!' indicates invalid input
 	    System.out.print("\nSorry! That's not a valid option.\n\nWould you like to be X's or O's? ");
 	    p1Pref = standardizeResponse(s.next().toLowerCase()); 
-	    
 	}
+
 	//separate player 1 and player 2 responses
 	System.out.println();
+
 	//prompt player2
 	System.out.print("Player 2, what is your name? ");
 	player2 = p.nextLine().trim();
